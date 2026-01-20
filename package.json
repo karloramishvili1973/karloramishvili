@@ -1,0 +1,14 @@
+{
+  "name": "enterprise-dao-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install:all": "pnpm -w install",
+    "build": "pnpm -w run build",
+    "test": "pnpm -w run test",
+    "lint": "pnpm -w run lint"
+  }
+}

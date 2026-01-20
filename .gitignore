@@ -1,0 +1,24 @@
+# Node
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.env
+.env.*
+.DS_Store
+/dist
+/build
+/.cache
+
+# Hardhat
+cache/
+artifacts/
+coverage/
+
+# VSCode
+.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

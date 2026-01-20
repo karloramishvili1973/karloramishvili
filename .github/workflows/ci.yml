@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install repository dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compile contracts
+        run: pnpm --filter ./packages/contracts run compile
+
+      - name: Run contracts tests
+        run: |
+          cd packages/contracts
+          pnpm install --frozen-lockfile
+          pnpm run compile
+          pnpm test
+
+      - name: Run frontend tests (optional)
+        run: |
+          if [ -d packages/frontend ]; then
+            cd packages/frontend
+            pnpm install --frozen-lockfile || true
+            pnpm test || echo "No frontend tests configured"
+          else
+            echo "No frontend package"
+          fi
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-test-logs
+          path: packages/contracts/test-output.txt

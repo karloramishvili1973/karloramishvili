@@ -1,0 +1,31 @@
+{
+  "name": "@dao/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "typechain": "hardhat typechain",
+    "lint": "eslint . --ext .ts,.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
+    "@nomicfoundation/hardhat-network-helpers": "^1.1.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-etherscan": "^3.1.8",
+    "@openzeppelin/contracts": "^4.9.6",
+    "@typechain/ethers-v5": "^10.2.1",
+    "@typechain/hardhat": "^6.1.6",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^9.1.1",
+    "chai": "^4.3.7",
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.16.0",
+    "hardhat-deploy": "^0.11.23",
+    "hardhat-gas-reporter": "^1.0.10",
+    "solidity-coverage": "^0.8.17",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.3.2",
+    "typescript": "^4.9.5"
+  }
+}

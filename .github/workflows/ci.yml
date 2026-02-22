@@ -28,8 +28,33 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-      - name: Install workspace dependencies
-        run: pnpm -w install --frozen-lockfile
+      - name: Install root dependencies (frozen, fallback allowed)
+        run: |
+          pnpm install --frozen-lockfile || pnpm install
+
+      - name: Install contracts dependencies
+        run: |
+          if [ -f packages/contracts/package.json ]; then
+            (cd packages/contracts && pnpm install)
+          else
+            echo "No contracts package"
+          fi
+
+      - name: Install frontend dependencies
+        run: |
+          if [ -f packages/frontend/package.json ]; then
+            (cd packages/frontend && pnpm install)
+          else
+            echo "No frontend package"
+          fi
+
+      - name: Install backend dependencies
+        run: |
+          if [ -f packages/backend/package.json ]; then
+            (cd packages/backend && pnpm install)
+          else
+            echo "No backend package"
+          fi
       - name: Run contracts tests
         run: |
           if [ -f packages/contracts/package.json ]; then

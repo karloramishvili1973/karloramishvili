@@ -20,20 +20,25 @@ jobs:
         with:
           version: 8
       - name: Install workspace dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm -w install
       - name: Run contracts tests
-        run: pnpm --filter ./packages/contracts test || true
+        run: |
+          if [ -f packages/contracts/package.json ]; then
+            pnpm --filter ./packages/contracts test
+          else
+            echo "No contracts package"
+          fi
       - name: Run frontend tests (if any)
         run: |
           if [ -f packages/frontend/package.json ]; then
-            pnpm --filter ./packages/frontend test || echo "No frontend tests or tests failed"
+            pnpm --filter ./packages/frontend test
           else
             echo "No frontend package"
           fi
       - name: Run backend tests (if any)
         run: |
           if [ -f packages/backend/package.json ]; then
-            pnpm --filter ./packages/backend test || echo "No backend tests or tests failed"
+            pnpm --filter ./packages/backend test
           else
             echo "No backend package"
           fi

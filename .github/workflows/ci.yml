@@ -20,7 +20,7 @@ jobs:
         with:
           version: 8
       - name: Install workspace dependencies
-        run: pnpm -w install
+        run: pnpm install --frozen-lockfile
       - name: Run contracts tests
         run: |
           if [ -f packages/contracts/package.json ]; then

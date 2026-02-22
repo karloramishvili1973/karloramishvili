@@ -7,8 +7,8 @@
   ],
   "scripts": {
     "install:all": "pnpm -w install",
-    "build": "pnpm -w run build",
-    "test": "pnpm -w run test",
-    "lint": "pnpm -w run lint"
+    "build": "pnpm -w -r run build",
+    "test": "pnpm -w -r run test",
+    "lint": "pnpm -w -r run lint"
   }
 }

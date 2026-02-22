@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
   },
   "dependencies": {
     "express": "^4.18.2"

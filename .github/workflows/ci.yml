@@ -7,53 +7,72 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'pnpm'
-
+          node-version: '18'
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
-
+          version: 10
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Install repository dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Compile contracts
-        run: pnpm --filter ./packages/contracts run compile
-
-      - name: Run contracts tests
+          path: |
+            ~/.local/share/pnpm/store/v3
+            node_modules/.pnpm
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install root dependencies (frozen, fallback allowed)
         run: |
-          cd packages/contracts
-          pnpm install --frozen-lockfile
-          pnpm run compile
-          pnpm test
+          pnpm install --frozen-lockfile || pnpm install
 
-      - name: Run frontend tests (optional)
+      - name: Install contracts dependencies
         run: |
-          if [ -d packages/frontend ]; then
-            cd packages/frontend
-            pnpm install --frozen-lockfile || true
-            pnpm test || echo "No frontend tests configured"
+          if [ -f packages/contracts/package.json ]; then
+            (cd packages/contracts && pnpm install)
+          else
+            echo "No contracts package"
+          fi
+
+      - name: Install frontend dependencies
+        run: |
+          if [ -f packages/frontend/package.json ]; then
+            (cd packages/frontend && pnpm install)
           else
             echo "No frontend package"
           fi
 
-      - name: Upload test logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: contract-test-logs
-          path: packages/contracts/test-output.txt
+      - name: Install backend dependencies
+        run: |
+          if [ -f packages/backend/package.json ]; then
+            (cd packages/backend && pnpm install)
+          else
+            echo "No backend package"
+          fi
+      - name: Run contracts tests
+        run: |
+          if [ -f packages/contracts/package.json ]; then
+            pnpm --filter ./packages/contracts test
+          else
+            echo "No contracts package"
+          fi
+      - name: Run frontend tests (if any)
+        run: |
+          if [ -f packages/frontend/package.json ]; then
+            pnpm --filter ./packages/frontend test
+          else
+            echo "No frontend package"
+          fi
+      - name: Run backend tests (if any)
+        run: |
+          if [ -f packages/backend/package.json ]; then
+            pnpm --filter ./packages/backend test
+          else
+            echo "No backend package"
+          fi

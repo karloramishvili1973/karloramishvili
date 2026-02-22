@@ -17,3 +17,14 @@ describe('Backend utils', () => {
     expect(isEven(7)).toBe(false)
   })
 })
+
+describe('Backend utils edge cases', () => {
+  it('mul negatives', () => {
+    expect(mul(-3, 5)).toBe(-15)
+    expect(mul(-3, -4)).toBe(12)
+  })
+
+  it('isEven zero', () => {
+    expect(isEven(0)).toBe(true)
+  })
+})

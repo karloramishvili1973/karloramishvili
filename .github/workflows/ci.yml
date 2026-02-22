@@ -7,7 +7,44 @@ on:
     branches: [main]
 
 jobs:
+  contracts:
+    name: Contracts tests (Node 16)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/pnpm/store/v3
+            node_modules/.pnpm
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install root deps + contracts deps
+        run: |
+          pnpm install --frozen-lockfile || pnpm install
+          if [ -f packages/contracts/package.json ]; then
+            (cd packages/contracts && pnpm install)
+          fi
+      - name: Run contracts tests
+        run: |
+          if [ -f packages/contracts/package.json ]; then
+            pnpm --filter ./packages/contracts test
+          else
+            echo "No contracts package"
+          fi
+
   test:
+    name: Frontend & Backend tests (Node 18)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,14 +69,6 @@ jobs:
         run: |
           pnpm install --frozen-lockfile || pnpm install
 
-      - name: Install contracts dependencies
-        run: |
-          if [ -f packages/contracts/package.json ]; then
-            (cd packages/contracts && pnpm install)
-          else
-            echo "No contracts package"
-          fi
-
       - name: Install frontend dependencies
         run: |
           if [ -f packages/frontend/package.json ]; then
@@ -54,13 +83,6 @@ jobs:
             (cd packages/backend && pnpm install)
           else
             echo "No backend package"
-          fi
-      - name: Run contracts tests
-        run: |
-          if [ -f packages/contracts/package.json ]; then
-            pnpm --filter ./packages/contracts test
-          else
-            echo "No contracts package"
           fi
       - name: Run frontend tests (if any)
         run: |

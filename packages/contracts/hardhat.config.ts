@@ -6,7 +6,13 @@ const MNEMONIC = process.env.MNEMONIC || "test test test test test test test tes
 
 const config = {
   solidity: {
-    compilers: [{ version: "0.8.18" }]
+    compilers: [{ version: "0.8.18" }],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
   },
   networks: {
     hardhat: { chainId: 1337 },

@@ -19,7 +19,9 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
+          # Use pnpm v7 here to stay compatible with Node 16 used by the contracts job
+          version: 7
+      # FIXUP: bump file to force CI re-run (no behavioral change)
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:

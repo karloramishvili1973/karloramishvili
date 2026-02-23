@@ -109,7 +109,34 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run Slither (Docker)
         run: |
+          # Run Slither inside the official container and write a JSON report
           docker run --rm -v ${{ github.workspace }}:/data -w /data --entrypoint slither trailofbits/slither:latest packages/contracts/contracts --json packages/contracts/slither-report.json || true
+          # Ensure report exists even if Slither didn't produce output
+          if [ ! -f packages/contracts/slither-report.json ]; then
+            echo "[]" > packages/contracts/slither-report.json
+          fi
+          echo "Slither report written to packages/contracts/slither-report.json"
+      - name: Summarize Slither findings and fail on any issues
+        run: |
+          python3 - <<'PY'
+import json,sys,os
+path='packages/contracts/slither-report.json'
+if not os.path.exists(path):
+    print('No slither report found; treating as no findings')
+    sys.exit(0)
+data=json.load(open(path))
+count=len(data) if isinstance(data, list) else 0
+print(f'Slither findings: {count}')
+if count>0:
+    print('\nSummary of first findings:')
+    for f in data[:20]:
+        title = f.get('check') or f.get('title') or '<no title>'
+        impact = f.get('impact') or f.get('severity') or '<no severity>'
+        source = f.get('source') or ''
+        print('-', title, '| impact:', impact, '| source:', source)
+    # Fail the job when any findings are present. Adjust threshold here if desired.
+    sys.exit(1)
+PY
       - name: Upload Slither report
         uses: actions/upload-artifact@v4
         with:

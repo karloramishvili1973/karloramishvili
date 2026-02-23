@@ -112,11 +112,25 @@ jobs:
           # Run Slither inside the official container and write a JSON report
           # Target the whole contracts package and pin the Solidity version to match our contracts
           docker run --rm -v ${{ github.workspace }}:/data -w /data --entrypoint slither trailofbits/slither:latest packages/contracts --json packages/contracts/slither-report.json --solc-version 0.8.18 --detect reentrancy,uninitialized-state,unchecked-send,timestamp,low-level-calls || true
+          # Diagnostic: show contracts tree before running Slither
+          echo "== contracts tree before slither ==";
+          ls -la packages/contracts || true;
+          echo "== end tree ==";
+
           # Ensure report exists even if Slither didn't produce output
           if [ ! -f packages/contracts/slither-report.json ]; then
             echo "[]" > packages/contracts/slither-report.json
           fi
           echo "Slither report written to packages/contracts/slither-report.json"
+      - name: Dump Slither report
+        run: |
+          echo "== slither-report.json contents ==";
+          if [ -f packages/contracts/slither-report.json ]; then
+            cat packages/contracts/slither-report.json || true;
+          else
+            echo "(no report file)";
+          fi
+          echo "== end report ==";
       - name: Summarize Slither findings and fail on any issues
         run: |
           python3 - <<'PY'

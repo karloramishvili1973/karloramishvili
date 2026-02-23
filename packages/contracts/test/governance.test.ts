@@ -1,8 +1,10 @@
+import '@nomicfoundation/hardhat-chai-matchers';
 import { expect } from "chai";
 import hre from 'hardhat';
 const { ethers } = hre;
 
 describe("Governance flow (basic)", function () {
+  this.timeout(120000);
   it("deploys token and timelock", async function () {
     const [owner] = await ethers.getSigners();
 

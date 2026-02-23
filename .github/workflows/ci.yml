@@ -19,7 +19,9 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
+          # Use pnpm v7 here to stay compatible with Node 16 used by the contracts job
+          version: 7
+      # FIXUP: bump file to force CI re-run (no behavioral change)
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
@@ -98,3 +100,18 @@ jobs:
           else
             echo "No backend package"
           fi
+
+  slither:
+    name: Slither static analysis
+    runs-on: ubuntu-latest
+    needs: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Slither (Docker)
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/data -w /data --entrypoint slither trailofbits/slither:latest packages/contracts/contracts --json packages/contracts/slither-report.json || true
+      - name: Upload Slither report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slither-report
+          path: packages/contracts/slither-report.json

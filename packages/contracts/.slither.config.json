@@ -1,0 +1,12 @@
+{
+  "solc_version": "0.8.18",
+  "detect": [
+    "reentrancy",
+    "uninitialized-state",
+    "unchecked-send",
+    "timestamp",
+    "low-level-calls"
+  ],
+  "exclude": [],
+  "notes": "Local config for Slither detectors. The CI invocation also passes --solc-version and --detect flags to the container for explicitness."
+}

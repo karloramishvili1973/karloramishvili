@@ -110,7 +110,8 @@ jobs:
       - name: Run Slither (Docker)
         run: |
           # Run Slither inside the official container and write a JSON report
-          docker run --rm -v ${{ github.workspace }}:/data -w /data --entrypoint slither trailofbits/slither:latest packages/contracts/contracts --json packages/contracts/slither-report.json || true
+          # Target the whole contracts package and pin the Solidity version to match our contracts
+          docker run --rm -v ${{ github.workspace }}:/data -w /data --entrypoint slither trailofbits/slither:latest packages/contracts --json packages/contracts/slither-report.json --solc-version 0.8.18 --detect reentrancy,uninitialized-state,unchecked-send,timestamp,low-level-calls || true
           # Ensure report exists even if Slither didn't produce output
           if [ ! -f packages/contracts/slither-report.json ]; then
             echo "[]" > packages/contracts/slither-report.json

@@ -18,7 +18,7 @@ async function main() {
   console.log('TimelockController deployed to:', timelock.address);
 
   const Governor = await ethers.getContractFactory('GovernorContract');
-  const governor = await Governor.deploy(token.address, timelock.address);
+  const governor = await Governor.deploy(token.address, timelock.address, { gasLimit: 8000000 });
   await governor.deployed();
   console.log('GovernorContract deployed to:', governor.address);
 
